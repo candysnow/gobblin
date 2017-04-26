@@ -62,6 +62,7 @@ public abstract class TimeBasedWriterPartitioner<D> implements WriterPartitioner
   public static final String DEFAULT_WRITER_PARTITION_TIMEZONE = ConfigurationKeys.PST_TIMEZONE_NAME;
   public static final String WRITER_PARTITION_GRANULARITY = ConfigurationKeys.WRITER_PREFIX + ".partition.granularity";
   public static final DatePartitionType DEFAULT_WRITER_PARTITION_GRANULARITY = DatePartitionType.HOUR;
+  public static final String WRITER_PARTITION_COUNTRY = ConfigurationKeys.WRITER_PREFIX + ".partition.country";
 
   public static final String PARTITIONED_PATH = "partitionedPath";
   public static final String PREFIX = "prefix";
@@ -73,6 +74,7 @@ public abstract class TimeBasedWriterPartitioner<D> implements WriterPartitioner
   private final DateTimeZone timeZone;
   private final Optional<DateTimeFormatter> timestampToPathFormatter;
   private final Schema schema;
+  private final Optional<String> country;
 
   public TimeBasedWriterPartitioner(State state, int numBranches, int branchId) {
     this.writerPartitionPrefix = getWriterPartitionPrefix(state, numBranches, branchId);
@@ -81,6 +83,15 @@ public abstract class TimeBasedWriterPartitioner<D> implements WriterPartitioner
     this.timeZone = getTimeZone(state, numBranches, branchId);
     this.timestampToPathFormatter = getTimestampToPathFormatter(state, numBranches, branchId);
     this.schema = getSchema();
+    this.country = getCountry(state, numBranches, branchId);
+  }
+
+  private Optional<String> getCountry(State state, int numBranches, int branchId) {
+    String propName = ForkOperatorUtils.getPropertyNameForBranch(WRITER_PARTITION_COUNTRY, numBranches, branchId);
+    if (state.contains(propName)) {
+      return Optional.of(state.getProp(propName));
+    }
+    return Optional.absent();
   }
 
   private static String getWriterPartitionPrefix(State state, int numBranches, int branchId) {
@@ -143,6 +154,9 @@ public abstract class TimeBasedWriterPartitioner<D> implements WriterPartitioner
 
     if (this.timestampToPathFormatter.isPresent()) {
       String partitionedPath = getPartitionedPath(timestamp);
+      if (country.isPresent()) {
+        partitionedPath += "/" + country.get();
+      }
       partition.put(PARTITIONED_PATH, partitionedPath);
     } else {
       DateTime dateTime = new DateTime(timestamp, this.timeZone);

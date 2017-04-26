@@ -182,7 +182,7 @@ public class KafkaWrapper implements Closeable {
     public static final String CONFIG_KAFKA_SOCKET_TIMEOUT_VALUE = CONFIG_PREFIX + "socketTimeoutMillis";
     public static final int CONFIG_KAFKA_SOCKET_TIMEOUT_VALUE_DEFAULT = 30000; // 30 seconds
     public static final String CONFIG_KAFKA_BUFFER_SIZE_BYTES = CONFIG_PREFIX + "bufferSizeBytes";
-    public static final int CONFIG_KAFKA_BUFFER_SIZE_BYTES_DEFAULT = 1024*1024; // 1MB
+    public static final int CONFIG_KAFKA_BUFFER_SIZE_BYTES_DEFAULT = 1024*1024*32; // 1MB
     public static final String CONFIG_KAFKA_CLIENT_NAME = CONFIG_PREFIX + "clientName";
     public static final String CONFIG_KAFKA_CLIENT_NAME_DEFAULT = "gobblin-kafka";
     public static final String CONFIG_KAFKA_FETCH_REQUEST_CORRELATION_ID = CONFIG_PREFIX + "fetchCorrelationId";

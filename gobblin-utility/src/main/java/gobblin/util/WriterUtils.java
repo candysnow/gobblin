@@ -45,6 +45,7 @@ public class WriterUtils {
    */
   public enum WriterFilePathType {
     TABLENAME,
+    EMPTY,
     DEFAULT
   }
 
@@ -126,6 +127,8 @@ public class WriterUtils {
     switch (getWriterFilePathType(state)) {
       case TABLENAME:
         return WriterUtils.getTableNameWriterFilePath(state);
+      case EMPTY:
+        return new Path(".");
       default:
         return WriterUtils.getDefaultWriterFilePath(state, numBranches, branchId);
     }

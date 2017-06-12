@@ -62,12 +62,14 @@ public class JobExecutionInfoServer extends AbstractIdleService {
   private final int port;
   private final Properties properties;
   private volatile Optional<HttpServer> httpServer;
+  private final Boolean portEnabled;
 
   public JobExecutionInfoServer(Properties properties) {
     this.properties = properties;
 
     port = getPort(properties);
-    serverUri = getServiceUri(getHost(properties), port);
+    portEnabled = getPortEnabled(properties);
+    serverUri = getServiceUri(getHost(properties), port, portEnabled);
     serverAdvertisedUri = getAdvertisedUri(properties);
   }
 
@@ -110,8 +112,12 @@ public class JobExecutionInfoServer extends AbstractIdleService {
     return serverAdvertisedUri;
   }
 
-  private static URI getServiceUri(String host, int port) {
-    return URI.create(String.format("http://%s:%d", host, port));
+  private static URI getServiceUri(String host, int port, Boolean portEnabled) {
+    if (portEnabled) {
+      return URI.create(String.format("http://%s:%d", host, port));
+    } else {
+      return URI.create(String.format("http://%s", host));
+    }
   }
 
   private static int getPort(Properties properties) {
@@ -129,6 +135,12 @@ public class JobExecutionInfoServer extends AbstractIdleService {
   private static URI getAdvertisedUri(Properties properties) {
     return URI.create(properties.getProperty(
             ConfigurationKeys.REST_SERVER_ADVERTISED_URI_KEY,
-            getServiceUri(getHost(properties), getPort(properties)).toString()));
+            getServiceUri(getHost(properties), getPort(properties), getPortEnabled(properties)).toString()));
+  }
+
+  private static Boolean getPortEnabled(Properties properties) {
+    return Boolean.parseBoolean(properties.getProperty(
+            ConfigurationKeys.REST_SERVER_PORT_ENABLED_KEY, Boolean.TRUE.toString()
+    ));
   }
 }

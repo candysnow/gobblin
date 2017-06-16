@@ -29,7 +29,7 @@ import gobblin.codec.StreamCodec;
  * Implement GZIP compression and decompression.
  */
 public class GzipCodec implements StreamCodec {
-  public static final String TAG = "gzip";
+  public static final String TAG = "gz";
 
   @Override
   public OutputStream encodeOutputStream(OutputStream origStream)
